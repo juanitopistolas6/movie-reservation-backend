@@ -1,5 +1,5 @@
 import { Movie, Seat } from 'src/movies/entities'
-import { User } from 'src/users/entities/user'
+import { User } from 'src/users/entities/user.entity'
 import {
   Column,
   CreateDateColumn,

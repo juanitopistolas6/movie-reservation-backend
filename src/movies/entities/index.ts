@@ -1,2 +1,2 @@
-export * from './movie'
-export * from './seat'
+export * from './movie.entity'
+export * from './seat.entity'

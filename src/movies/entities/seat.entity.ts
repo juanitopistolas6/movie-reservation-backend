@@ -5,8 +5,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Movie } from './movie'
-import { User } from 'src/users/entities/user'
+import { Movie } from './movie.entity'
+import { User } from 'src/users/entities/user.entity'
+import { SeatStatus } from '../interfaces'
 
 @Entity('seats')
 export class Seat {
@@ -14,16 +15,16 @@ export class Seat {
   id: string
 
   @Column()
-  seat: number
+  seat: string
 
-  @Column({ enum: ['available ', 'reserved', 'sold'], default: 'available' })
-  status: string
+  @Column({ type: 'enum', enum: SeatStatus, default: SeatStatus.AVAILABLE })
+  status: SeatStatus
 
   @ManyToOne(() => User, (user) => user.id, { nullable: true })
   @JoinColumn()
-  owner_id: User | null
+  owner: User | null
 
   @ManyToOne(() => Movie, (movie) => movie.id)
   @JoinColumn()
-  movie_id: Movie
+  movie: Movie
 }
