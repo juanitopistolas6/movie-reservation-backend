@@ -4,15 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
 import { SomeService } from 'src/util/some-service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private someService: SomeService,
-  ) {}
+  constructor(private someService: SomeService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
@@ -23,7 +19,7 @@ export class AuthGuard implements CanActivate {
 
     const payload = await this.someService.verifySignature(token)
 
-    request['user'] = payload
+    request['user'] = payload.user
 
     return true
   }

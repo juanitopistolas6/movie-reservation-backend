@@ -11,7 +11,7 @@ import { Authorization } from 'src/auth/decorators/authorize'
 import { AuthGuard, RoleGuard } from 'src/auth/guards'
 import { TypeUser } from './interfaces'
 import { UsersService } from './users.service'
-import { CreateUserDto } from './dto'
+import { CreateUserDto, UpdateUserDto } from './dto'
 
 @Controller('users')
 @UseGuards(AuthGuard, RoleGuard)
@@ -37,6 +37,8 @@ export class UsersController {
   }
 
   @Authorization(TypeUser.ADMIN)
-  @Patch()
-  async updateUser() {}
+  @Patch(':id')
+  async updateUser(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
+    return this.userService.updateUser(updateUser, id)
+  }
 }

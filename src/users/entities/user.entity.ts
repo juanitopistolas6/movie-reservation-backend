@@ -31,6 +31,9 @@ export class User {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date
 
+  @Column({ default: true })
+  active: boolean
+
   @BeforeInsert()
   async generateColumns() {
     this.salt = await bcrypt.genSalt(10)

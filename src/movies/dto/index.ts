@@ -1,0 +1,5 @@
+export * from './movie.dto'
+export * from './update-movie.dto'
+export * from './interval-dates.dto'
+export * from './pagination.dto'
+export * from './movie-by-date.dto'

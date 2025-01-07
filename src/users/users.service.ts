@@ -6,12 +6,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { Repository } from 'typeorm'
-import { CreateUserDto } from './dto'
+import { CreateUserDto, UpdateUserDto } from './dto'
+import { SomeService } from 'src/util/some-service'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private someService: SomeService,
   ) {}
 
   async getAll() {
@@ -38,5 +40,22 @@ export class UsersService {
     await this.userRepository.save(newUser)
 
     return newUser
+  }
+
+  async updateUser(updateData: UpdateUserDto, id: string) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id } })
+
+      if (updateData?.password) {
+        updateData.password = await this.someService.generatePassword(
+          updateData.password,
+          user.salt,
+        )
+      }
+
+      return this.userRepository.save({ ...user, ...updateData })
+    } catch (e) {
+      throw new BadRequestException(e.message)
+    }
   }
 }
