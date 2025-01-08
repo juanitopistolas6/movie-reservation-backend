@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Movie, Seat } from './entities'
 import { Between, Repository } from 'typeorm'
@@ -70,6 +74,16 @@ export class MoviesService {
     } catch (e) {
       throw new BadRequestException(e.message)
     }
+  }
+
+  async getMovie(id: string) {
+    const movie = await this.movieRepository.findOne({
+      where: { id, available: true },
+    })
+
+    if (!movie) throw new NotFoundException('Movie was not found')
+
+    return movie
   }
 
   async getMovieByDay(date: Date) {

@@ -24,7 +24,7 @@ export class Seat {
   @JoinColumn()
   owner: User | null
 
-  @ManyToOne(() => Movie, (movie) => movie.id)
+  @ManyToOne(() => Movie, (movie) => movie.id, { onDelete: 'CASCADE' })
   @JoinColumn()
   movie: Movie
 }

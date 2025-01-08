@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -27,12 +28,12 @@ export class Reservation {
   @JoinColumn()
   user: User
 
-  @ManyToOne(() => Movie, (movie) => movie.id)
+  @ManyToOne(() => Movie, (movie) => movie.id, { onDelete: 'CASCADE' })
   @JoinColumn()
   movie: Movie
 
-  @ManyToMany(() => Seat, (seat) => seat.id)
-  @JoinColumn()
+  @ManyToMany(() => Seat, (seat) => seat.id, { onDelete: 'CASCADE' })
+  @JoinTable()
   seats: Seat[]
 
   @CreateDateColumn({ type: 'timestamp' })

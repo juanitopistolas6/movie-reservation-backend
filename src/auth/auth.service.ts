@@ -26,7 +26,7 @@ export class AuthService {
       user.salt,
     )
 
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid password')
+    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials')
 
     delete user.password
     delete user.salt

@@ -25,6 +25,9 @@ export class UsersService {
 
     if (!user) throw new NotFoundException('User was not found')
 
+    delete user.password
+    delete user.salt
+
     return user
   }
 

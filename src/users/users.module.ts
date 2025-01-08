@@ -10,5 +10,6 @@ import { SomeService } from 'src/util/some-service'
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService, AuthGuard, SomeService],
   controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}
