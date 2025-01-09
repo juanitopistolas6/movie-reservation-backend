@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -18,12 +19,12 @@ export class Order {
   @Column()
   total: number
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { nullable: false })
   @JoinColumn()
   user: User
 
   @ManyToMany(() => Seat, (seat) => seat.id)
-  @JoinColumn()
+  @JoinTable()
   seats: Seat[]
 
   @ManyToOne(() => Movie, (movie) => movie.id)

@@ -8,6 +8,7 @@ import { Movie, Seat } from './entities'
 import { Between, Repository } from 'typeorm'
 import { CreateMovieDto, IntervalDatesDto, UpdateMovieDto } from './dto'
 import { Category } from 'src/category/entities/category.entity'
+import { SeatStatus } from './interfaces'
 
 @Injectable()
 export class MoviesService {
@@ -76,12 +77,24 @@ export class MoviesService {
     }
   }
 
-  async getMovie(id: string) {
+  async getMovieAndSeats(idMovie: string) {
+    const movie = await this.getMovie(idMovie, true)
+    const seats = await this.getSeats(idMovie)
+
+    return {
+      movie,
+      seats,
+    }
+  }
+
+  async getMovie(id: string, dateFilter: boolean) {
     const movie = await this.movieRepository.findOne({
       where: { id, available: true },
     })
 
     if (!movie) throw new NotFoundException('Movie was not found')
+    if (dateFilter && movie.showtime < new Date())
+      throw new BadRequestException('Movie is past the current date')
 
     return movie
   }
@@ -103,6 +116,8 @@ export class MoviesService {
         where: { available: true, id },
       })
 
+      await this.deleteSeats(id)
+
       return this.movieRepository.save({ ...movie, available: false })
     } catch (e) {
       throw new BadRequestException(e.message)
@@ -118,8 +133,6 @@ export class MoviesService {
         available: true,
       },
     })
-
-    console.log(movies)
 
     return movies
   }
@@ -167,5 +180,35 @@ export class MoviesService {
     if (!category) throw new BadRequestException('category is not registered')
 
     return category
+  }
+
+  async deleteSeats(idMovie: string) {
+    try {
+      const seats = await this.seatRepository.find({
+        where: {
+          movie: { id: idMovie },
+        },
+      })
+
+      seats.forEach((seat) => {
+        seat.status = SeatStatus.CANCELLED
+      })
+
+      return this.seatRepository.save(seats)
+    } catch (e) {
+      throw new BadRequestException(e.message)
+    }
+  }
+
+  async getSeats(idMovie: string) {
+    const seats = await this.seatRepository.find({
+      where: {
+        movie: { id: idMovie },
+      },
+    })
+
+    if (seats.length === 0) throw new NotFoundException('Seats were not found')
+
+    return seats
   }
 }

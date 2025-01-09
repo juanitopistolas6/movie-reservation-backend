@@ -29,8 +29,12 @@ export class ReservationsService {
   ) {
     try {
       const user = await this.usersService.getUser(idUser)
-      const movie = await this.moviesService.getMovie(idMovie)
-      const seats = await this.getSeats(seatsToFound, movie)
+      const movie = await this.moviesService.getMovie(idMovie, true)
+      const seats = await this.getSeats(
+        seatsToFound,
+        movie,
+        SeatStatus.AVAILABLE,
+      )
 
       seats.forEach((seat) => {
         seat.status = SeatStatus.RESERVED
@@ -51,14 +55,14 @@ export class ReservationsService {
     }
   }
 
-  async getSeats(seatsArray: string[], movie: Movie) {
+  async getSeats(seatsArray: string[], movie: Movie, status: SeatStatus) {
     const seatsSet = Array.from(new Set(seatsArray))
 
     const seats = await this.seatRepository.find({
       where: {
         seat: In(seatsSet),
         movie: { id: movie.id },
-        status: SeatStatus.AVAILABLE,
+        status,
       },
     })
 
@@ -89,6 +93,7 @@ export class ReservationsService {
         user: { id: idUser },
         id: idReservation,
       },
+      relations: ['seats', 'movie', 'user'],
     })
 
     if (!reservation) throw new NotFoundException('reservation not found')
@@ -108,7 +113,11 @@ export class ReservationsService {
       return seat.seat
     })
 
-    const seats = await this.getSeats(seatsIds, reservation.movie)
+    const seats = await this.getSeats(
+      seatsIds,
+      reservation.movie,
+      SeatStatus.RESERVED,
+    )
 
     seats.forEach((seat) => {
       seat.status = SeatStatus.AVAILABLE
@@ -124,15 +133,17 @@ export class ReservationsService {
     const reservation = await this.getReservation(idUser, idReservation)
 
     if (reservation.status !== ReservationStatus.PENDING)
-      throw new BadRequestException('Error while cancelling completing it')
+      throw new BadRequestException('Error while completing the reservation')
 
     reservation.status = ReservationStatus.COMPLETED
 
-    const seatsIds = reservation.seats.map((seat) => {
-      return seat.seat
-    })
+    const seatsIds = reservation.seats.map((seat) => seat.seat)
 
-    const seats = await this.getSeats(seatsIds, reservation.movie)
+    const seats = await this.getSeats(
+      seatsIds,
+      reservation.movie,
+      SeatStatus.RESERVED,
+    )
 
     seats.forEach((seat) => {
       seat.status = SeatStatus.SOLD

@@ -16,5 +16,6 @@ import { SomeService } from 'src/util/some-service'
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService, SomeService],
+  exports: [ReservationsService],
 })
 export class ReservationsModule {}
